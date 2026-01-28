@@ -44,7 +44,8 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 if (errorData.debug) {
                     const current = errorData.debug.currentScopes || '(none)';
                     const required = errorData.debug.requiredScopes || 'repo';
-                    throw new Error(`Token Permission Error.\n\nYour Token Scopes: [${current}]\nRequired Scopes: [${required}]\n\nAction: Create a "Classic" token with "repo" checked.`);
+                    const magicLink = "https://github.com/settings/tokens/new?scopes=repo&description=Netlify%20Admin%20Panel";
+                    throw new Error(`PERMISSIONS ERROR.\n\nYour token has NO permissions (Scope: ${current}).\n\n1. Copy this link:\n${magicLink}\n\n2. Open it in a new tab.\n3. Scroll down and click "Generate token".\n4. Copy the new token to Netlify.`);
                 }
 
                 throw new Error(errorData.error || response.statusText);
