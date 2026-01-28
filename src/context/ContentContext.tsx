@@ -37,11 +37,15 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newContent)
             });
-            if (!response.ok) throw new Error('Failed to save to API');
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                throw new Error(errorData.error || response.statusText);
+            }
             console.log('Content persisted successfully');
-        } catch (err) {
+            alert('Changes saved successfully!');
+        } catch (err: any) {
             console.error('Error persisting content:', err);
-            alert('Failed to save changes. Make sure GITHUB_TOKEN is set in Netlify Site Settings.');
+            alert(`Failed to save changes: ${err.message}. \n\nIf using Netlify, ensure GITHUB_TOKEN is set in Site Settings.`);
         }
     };
 
