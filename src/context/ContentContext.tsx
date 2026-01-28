@@ -39,6 +39,14 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
             });
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ error: response.statusText }));
+
+                // Enhanced debug message
+                if (errorData.debug) {
+                    const current = errorData.debug.currentScopes || '(none)';
+                    const required = errorData.debug.requiredScopes || 'repo';
+                    throw new Error(`Token Permission Error.\n\nYour Token Scopes: [${current}]\nRequired Scopes: [${required}]\n\nAction: Create a "Classic" token with "repo" checked.`);
+                }
+
                 throw new Error(errorData.error || response.statusText);
             }
             console.log('Content persisted successfully');
@@ -47,13 +55,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
             console.error('Error persisting content:', err);
 
             let errorMessage = err.message;
-            if (errorMessage.includes('Resource not accessible') || errorMessage.includes('403')) {
-                errorMessage = "Your GitHub Token is valid but lacks WRITE permission.\n\nPlease generate a new 'Classic' Personal Access Token with the 'repo' scope selected and update it in Netlify.";
-            } else if (errorMessage.includes('Bad credentials') || errorMessage.includes('401')) {
-                errorMessage = "Your GitHub Token is invalid or expired.\n\nPlease check your GITHUB_TOKEN in Netlify Site Settings.";
+            // Fallback for generic errors
+            if (!errorMessage.includes('Token Permission Error') && (errorMessage.includes('403') || errorMessage.includes('Resource not accessible'))) {
+                errorMessage = "Your GitHub Token lacks WRITE permission. Please create a new Classic Token with 'repo' scope.";
             }
 
-            alert(`Failed to save: ${errorMessage}`);
+            alert(`Failed to save: \n${errorMessage}`);
         }
     };
 

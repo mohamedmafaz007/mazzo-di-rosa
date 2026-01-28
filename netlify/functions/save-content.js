@@ -54,7 +54,23 @@ exports.handler = async (event, context) => {
 
         if (!putResp.ok) {
             const errorText = await putResp.text();
-            throw new Error(`GitHub API Error: ${putResp.status} ${errorText}`);
+            const currentScopes = putResp.headers.get('x-oauth-scopes');
+            const requiredScopes = putResp.headers.get('x-accepted-oauth-scopes');
+
+            console.error(`GitHub API Error: ${putResp.status} ${errorText}`);
+            console.error(`Current Scopes: ${currentScopes}`);
+
+            return {
+                statusCode: putResp.status,
+                body: JSON.stringify({
+                    error: `GitHub API Error: ${putResp.status}`,
+                    details: errorText,
+                    debug: {
+                        currentScopes: currentScopes,
+                        requiredScopes: requiredScopes
+                    }
+                })
+            };
         }
 
         return {
