@@ -83,7 +83,7 @@ const ContactEditor = () => {
                             <Input
                                 value={data.info.whatsapp}
                                 onChange={(e) => updateInfo('whatsapp', e.target.value)}
-                                placeholder="918124817806"
+                                placeholder="919445687883"
                             />
                         </div>
                     </div>

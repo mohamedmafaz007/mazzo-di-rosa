@@ -207,8 +207,8 @@ export const defaultContent: SiteContent = {
         title: "Let's Create Something Beautiful",
         description: "Ready to place an order? Get in touch with us and let us craft the perfect bouquet for your special moment",
         info: {
-            phone: "+91 81248 17806",
-            whatsapp: "918124817806",
+            phone: "+91 94456 87883",
+            whatsapp: "919445687883",
             email: "hello@mazzodirrosa.com",
             address: "Mumbai, Maharashtra, India"
         },

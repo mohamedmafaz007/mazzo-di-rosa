@@ -12,8 +12,8 @@ interface BouquetCardProps {
 const BouquetCard = ({ image, name, description, price, category }: BouquetCardProps) => {
   const { toast } = useToast();
 
-  const handleContactClick = async () => {
-    const whatsappNumber = '918124817806';
+  const handleContactClick = () => {
+    const whatsappNumber = '919445687883';
 
     // Structured message for the order
     const message = `🌟 *NEW ORDER REQUEST* 🌟\n\n` +
@@ -24,37 +24,10 @@ const BouquetCard = ({ image, name, description, price, category }: BouquetCardP
       `—————————————————\n\n` +
       `Hello Mazzo di Rosa! I saw this beautiful bouquet on your website and would like to place an order.`;
 
-    try {
-      // Step 1: Attempt to use the Web Share API (Best for Mobile, attaches ACTUAL image)
-      if (navigator.share && (navigator as any).canShare) {
-        const response = await fetch(image);
-        const blob = await response.blob();
-        const file = new File([blob], `${name.replace(/\s+/g, '-').toLowerCase()}.jpg`, { type: 'image/jpeg' });
-
-        const shareData = {
-          files: [file],
-          title: 'Order: ' + name,
-          text: message,
-        };
-
-        if ((navigator as any).canShare(shareData)) {
-          await navigator.share(shareData);
-          toast({
-            title: "Success",
-            description: "Please select WhatsApp and your contact to complete the order.",
-          });
-          return; // Exit if share was successful
-        }
-      }
-    } catch (error) {
-      console.error('Error sharing image:', error);
-    }
-
-    // Step 2: Fallback to WhatsApp wa.me link if Share API is not available (Desktop/Older browsers)
     const fullImageUrl = `${window.location.origin}${image}`;
-    const fallbackMessage = `${message}\n\n🖼️ *Product Image:* \n${fullImageUrl}`;
+    const finalMessage = `${message}\n\n🖼️ *Product Image:* \n${fullImageUrl}`;
 
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(fallbackMessage)}`, '_blank');
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(finalMessage)}`, '_blank');
 
     toast({
       title: "Order Request Initiated",
