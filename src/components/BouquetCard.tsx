@@ -14,24 +14,36 @@ const BouquetCard = ({ image, name, description, price, category }: BouquetCardP
 
   const handleContactClick = () => {
     const whatsappNumber = '919445687883';
+    const currentUrl = window.location.origin;
+    const fullImageUrl = image.startsWith('http') ? image : `${currentUrl}${image}`;
 
-    // Structured message for the order
-    const message = `🌟 *NEW ORDER REQUEST* 🌟\n\n` +
-      `—————————————————\n` +
-      `🌸 *Bouquet:* ${name}\n` +
-      `💰 *Price:* ${price}\n` +
-      `📝 *Details:* ${description}\n` +
-      `—————————————————\n\n` +
-      `Hello Mazzo di Rosa! I saw this beautiful bouquet on your website and would like to place an order.`;
+    // Create a robust message
+    const messageLines = [
+      `🌟 *NEW ORDER REQUEST* 🌟`,
+      ``,
+      `—————————————————`,
+      `🌸 *Bouquet:* ${name}`,
+      `💰 *Price:* ${price}`,
+      `📝 *Details:* ${description}`,
+      `—————————————————`,
+      ``,
+      `Hello Mazzo di Rosa! I saw this beautiful bouquet on your website and would like to place an order.`,
+      ``,
+      `🖼️ *Product Image:*`,
+      `${fullImageUrl}`
+    ];
 
-    const fullImageUrl = `${window.location.origin}${image}`;
-    const finalMessage = `${message}\n\n🖼️ *Product Image:* \n${fullImageUrl}`;
+    const finalMessage = messageLines.join('\n');
+    const encodedMessage = encodeURIComponent(finalMessage);
 
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(finalMessage)}`, '_blank');
+    // Direct link to WhatsApp
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, '_blank');
 
     toast({
-      title: "Order Request Initiated",
-      description: "Redirecting to WhatsApp with bouquet details",
+      title: "Opening WhatsApp",
+      description: "Redirecting you to chat with us directly...",
     });
   };
 
