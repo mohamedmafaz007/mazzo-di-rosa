@@ -3,10 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import fs from "fs";
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Custom plugin to handle local content API
 const localApiPlugin = () => ({
@@ -15,7 +11,7 @@ const localApiPlugin = () => ({
     server.middlewares.use((req, res, next) => {
       // Handle GET /api/content
       if (req.url === '/api/content' && req.method === 'GET') {
-        const filePath = path.resolve(__dirname, 'public/content.json');
+        const filePath = path.resolve(__dirname, 'src/context/content.json');
         if (fs.existsSync(filePath)) {
           const content = fs.readFileSync(filePath, 'utf-8');
           res.setHeader('Content-Type', 'application/json');
@@ -33,7 +29,7 @@ const localApiPlugin = () => ({
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
           try {
-            const filePath = path.resolve(__dirname, 'public/content.json');
+            const filePath = path.resolve(__dirname, 'src/context/content.json');
             fs.writeFileSync(filePath, body, 'utf-8');
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ success: true }));

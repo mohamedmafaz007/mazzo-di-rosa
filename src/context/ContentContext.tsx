@@ -14,54 +14,30 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [content, setContent] = useState<SiteContent>(defaultContent);
 
-    // Initial fetch from static JSON file
+    // Initial fetch from Local API
     useEffect(() => {
-        fetch('/content.json')
+        fetch('/api/content')
             .then(res => res.json())
             .then(data => {
-                if (data && !data.error) {
+                if (!data.error) {
                     setContent(data);
                 }
             })
-            .catch(err => console.error('Error fetching content:', err));
+            .catch(err => console.error('Error fetching content from API:', err));
     }, []);
 
-    // Save to API (Local middleware or Netlify Function)
+    // Save to Local API whenever content changes
     const saveToApi = async (newContent: SiteContent) => {
         try {
-            // In development, use local middleware. In production, use Netlify Function.
-            const endpoint = import.meta.env.DEV ? '/api/content' : '/.netlify/functions/save-content';
-
-            const response = await fetch(endpoint, {
+            const response = await fetch('/api/content', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newContent)
             });
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: response.statusText }));
-
-                // Enhanced debug message
-                if (errorData.debug) {
-                    const current = errorData.debug.currentScopes || '(none)';
-                    const required = errorData.debug.requiredScopes || 'repo';
-                    const magicLink = "https://github.com/settings/tokens/new?scopes=repo&description=Netlify%20Admin%20Panel";
-                    throw new Error(`PERMISSIONS ERROR.\n\nYour token has NO permissions (Scope: ${current}).\n\n1. Copy this link:\n${magicLink}\n\n2. Open it in a new tab.\n3. Scroll down and click "Generate token".\n4. Copy the new token to Netlify.`);
-                }
-
-                throw new Error(errorData.error || response.statusText);
-            }
-            console.log('Content persisted successfully');
-            alert('Changes saved successfully!');
-        } catch (err: any) {
+            if (!response.ok) throw new Error('Failed to save to API');
+            console.log('Content persisted to codebase successfully');
+        } catch (err) {
             console.error('Error persisting content:', err);
-
-            let errorMessage = err.message;
-            // Fallback for generic errors
-            if (!errorMessage.includes('Token Permission Error') && (errorMessage.includes('403') || errorMessage.includes('Resource not accessible'))) {
-                errorMessage = "Your GitHub Token lacks WRITE permission. Please create a new Classic Token with 'repo' scope.";
-            }
-
-            alert(`Failed to save: \n${errorMessage}`);
         }
     };
 
