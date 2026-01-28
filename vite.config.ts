@@ -11,7 +11,7 @@ const localApiPlugin = () => ({
     server.middlewares.use((req, res, next) => {
       // Handle GET /api/content
       if (req.url === '/api/content' && req.method === 'GET') {
-        const filePath = path.resolve(__dirname, 'src/context/content.json');
+        const filePath = path.resolve(__dirname, 'public/content.json');
         if (fs.existsSync(filePath)) {
           const content = fs.readFileSync(filePath, 'utf-8');
           res.setHeader('Content-Type', 'application/json');
@@ -29,7 +29,7 @@ const localApiPlugin = () => ({
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
           try {
-            const filePath = path.resolve(__dirname, 'src/context/content.json');
+            const filePath = path.resolve(__dirname, 'public/content.json');
             fs.writeFileSync(filePath, body, 'utf-8');
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ success: true }));

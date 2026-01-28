@@ -14,30 +14,34 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [content, setContent] = useState<SiteContent>(defaultContent);
 
-    // Initial fetch from Local API
+    // Initial fetch from static JSON file
     useEffect(() => {
-        fetch('/api/content')
+        fetch('/content.json')
             .then(res => res.json())
             .then(data => {
-                if (!data.error) {
+                if (data && !data.error) {
                     setContent(data);
                 }
             })
-            .catch(err => console.error('Error fetching content from API:', err));
+            .catch(err => console.error('Error fetching content:', err));
     }, []);
 
-    // Save to Local API whenever content changes
+    // Save to API (Local middleware or Netlify Function)
     const saveToApi = async (newContent: SiteContent) => {
         try {
-            const response = await fetch('/api/content', {
+            // In development, use local middleware. In production, use Netlify Function.
+            const endpoint = import.meta.env.DEV ? '/api/content' : '/.netlify/functions/save-content';
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newContent)
             });
             if (!response.ok) throw new Error('Failed to save to API');
-            console.log('Content persisted to codebase successfully');
+            console.log('Content persisted successfully');
         } catch (err) {
             console.error('Error persisting content:', err);
+            alert('Failed to save changes. Make sure GITHUB_TOKEN is set in Netlify Site Settings.');
         }
     };
 
