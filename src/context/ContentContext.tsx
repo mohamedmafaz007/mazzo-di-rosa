@@ -45,7 +45,15 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
             alert('Changes saved successfully!');
         } catch (err: any) {
             console.error('Error persisting content:', err);
-            alert(`Failed to save changes: ${err.message}. \n\nIf using Netlify, ensure GITHUB_TOKEN is set in Site Settings.`);
+
+            let errorMessage = err.message;
+            if (errorMessage.includes('Resource not accessible') || errorMessage.includes('403')) {
+                errorMessage = "Your GitHub Token is valid but lacks WRITE permission.\n\nPlease generate a new 'Classic' Personal Access Token with the 'repo' scope selected and update it in Netlify.";
+            } else if (errorMessage.includes('Bad credentials') || errorMessage.includes('401')) {
+                errorMessage = "Your GitHub Token is invalid or expired.\n\nPlease check your GITHUB_TOKEN in Netlify Site Settings.";
+            }
+
+            alert(`Failed to save: ${errorMessage}`);
         }
     };
 
